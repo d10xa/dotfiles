@@ -15,5 +15,8 @@ plugins=(
   zsh-aliases-exa
 )
 source $ZSH/oh-my-zsh.sh
-# https://iterm2.com/documentation-shell-integration.html
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+system_type=$(uname -s)
+if [ "$system_type" = "Darwin" ]; then
+  # https://iterm2.com/documentation-shell-integration.html
+  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+fi
