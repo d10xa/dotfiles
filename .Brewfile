@@ -1,3 +1,8 @@
+brew "exa"
+brew "direnv"
+brew "git-cola"
+brew "sphinx-doc" # required by git-cola
+cask "github"
 cask "google-chrome"
 cask "alfred"
 cask "bitwarden"
