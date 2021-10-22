@@ -3,6 +3,7 @@ brew "direnv"
 brew "git-cola"
 brew "sphinx-doc" # required by git-cola
 brew "docker-compose"
+brew "ghq"
 cask "google-chrome"
 cask "alfred"
 cask "bitwarden"
