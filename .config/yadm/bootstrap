@@ -38,5 +38,3 @@ if [ ! -f $zsh_aliases_exa_dir/zsh-aliases-exa.plugin.zsh ]; then
   git clone --no-checkout https://github.com/DarrinTisdale/zsh-aliases-exa.git $zsh_aliases_exa_dir
   git -c advice.detachedHead=false -C $zsh_aliases_exa_dir checkout f6b72da193f03911009cb95e3e2e18e48b918833
 fi
-
-fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install > "$HOME/.fasd-init-zsh"
