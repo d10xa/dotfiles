@@ -1,6 +1,7 @@
 brew "direnv"
 brew "docker-compose"
 brew "exa"
+brew "fasd"
 brew "ghq"
 brew "git-cola"
 brew "jq"

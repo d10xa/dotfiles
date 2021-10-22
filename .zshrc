@@ -29,6 +29,14 @@ if [ "$system_type" = "Darwin" ]; then
 fi
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
 if [ -f "$HOME/.zshrc_local" ]; then
   source "$HOME/.zshrc_local"
 fi
+
+fasd_cache="$HOME/.fasd-init-zsh"
+if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
+  fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install >| "$fasd_cache"
+fi
+source "$fasd_cache"
+unset fasd_cache
