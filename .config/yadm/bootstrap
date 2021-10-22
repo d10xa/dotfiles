@@ -25,3 +25,16 @@ fi
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
+
+powerlevel10k_dir=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+if [ ! -d $powerlevel10k_dir ]; then
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $powerlevel10k_dir
+else
+  git -C $powerlevel10k_dir pull --ff-only
+fi
+
+zsh_aliases_exa_dir=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-aliases-exa
+if [ ! -f $zsh_aliases_exa_dir/zsh-aliases-exa.plugin.zsh ]; then
+  git clone --no-checkout https://github.com/DarrinTisdale/zsh-aliases-exa.git $zsh_aliases_exa_dir
+  git -c advice.detachedHead=false -C $zsh_aliases_exa_dir checkout f6b72da193f03911009cb95e3e2e18e48b918833
+fi
