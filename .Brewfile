@@ -23,3 +23,5 @@ cask "spectacle"
 cask "standard-notes"
 cask "telegram-desktop"
 cask "visual-studio-code"
+cask "vlc"
+
