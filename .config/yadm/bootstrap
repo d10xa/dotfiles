@@ -49,6 +49,6 @@ else
   cs update cs
 fi
 
-cs setup --env --jvm 11 --yes --apps ammonite,coursier,scala,scalac,sbt,sbt,giter8,scala3
+cs setup --env --jvm 11 --yes --apps ammonite,coursier,scala,scalac,sbt,sbt,giter8,scala3,scalafix
 cs install --contrib plantuml
 
