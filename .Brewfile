@@ -10,6 +10,7 @@ brew "rsync"
 brew "sphinx-doc" # required by git-cola
 brew "tig"
 brew "tree"
+brew "coreutils" # grealpath
 brew "exiftool"
 cask "alfred"
 cask "bitwarden"
