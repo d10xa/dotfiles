@@ -12,7 +12,7 @@ HIST_STAMPS="yyyy-mm-dd"
 # https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins
 plugins=(
   git
-  osx
+  macos
   docker
   docker-compose
   vi-mode
