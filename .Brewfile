@@ -12,6 +12,7 @@ brew "tig"
 brew "tree"
 brew "coreutils" # grealpath
 brew "exiftool"
+brew "midnight-commander"
 cask "alfred"
 cask "bitwarden"
 cask "docker"
