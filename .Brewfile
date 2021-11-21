@@ -13,6 +13,7 @@ brew "tree"
 brew "coreutils" # grealpath
 brew "exiftool"
 brew "midnight-commander"
+brew "the_silver_searcher"
 cask "alfred"
 cask "bitwarden"
 cask "docker"
