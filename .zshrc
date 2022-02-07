@@ -57,4 +57,9 @@ if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
 fi
 source "$fasd_cache"
 unset fasd_cache
+if ! command -v terraform &> /dev/null
+then
+else
+  alias tf=terraform
+fi
 
