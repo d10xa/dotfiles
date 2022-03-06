@@ -1,4 +1,5 @@
 brew "direnv"
+brew "curl"
 brew "exa"
 brew "fasd"
 brew "ghq"

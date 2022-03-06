@@ -63,3 +63,5 @@ else
   alias tf=terraform
 fi
 
+export PATH="/usr/local/opt/curl/bin:$PATH"
+
