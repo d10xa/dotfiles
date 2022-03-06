@@ -65,3 +65,5 @@ fi
 
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
+alias cfv="PYENV_VERSION=2.7.18 pyenv exec cfv"
+

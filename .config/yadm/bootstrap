@@ -65,3 +65,11 @@ fi
 cs setup --env --jvm 11 --yes --apps ammonite,coursier,scala,scalac,sbt,sbt,giter8,scala3,scalafix
 cs install --contrib plantuml
 
+if [ ! -d $(pyenv root)/versions/2.7.18 ]; then
+  pyenv install 2.7.18
+fi
+
+if ! [ -x "$(command -v cfv)" ]; then
+  $(pyenv root)/versions/2.7.18/bin/pip install cfv
+fi
+
