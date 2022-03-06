@@ -1,4 +1,5 @@
 brew "direnv"
+brew "pyenv"
 brew "curl"
 brew "exa"
 brew "fasd"
