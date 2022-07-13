@@ -67,3 +67,10 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 
 alias cfv="PYENV_VERSION=2.7.18 pyenv exec cfv"
 
+# kubernetes
+if [ "$(command -v kubectl)" ]; then
+  alias k=kubectl
+  complete -F __start_kubectl k
+  source <(kubectl completion zsh)
+fi
+

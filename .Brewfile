@@ -28,4 +28,6 @@ cask "standard-notes"
 cask "telegram-desktop"
 cask "visual-studio-code"
 cask "vlc"
+cask "the-unarchiver"
+cask "obsidian"
 
