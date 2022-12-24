@@ -1,3 +1,4 @@
+brew "bat"
 brew "direnv"
 brew "pyenv"
 brew "curl"
