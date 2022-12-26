@@ -73,3 +73,5 @@ if ! [ -x "$(command -v cfv)" ]; then
   $(pyenv root)/versions/2.7.18/bin/pip install cfv
 fi
 
+mkdir "${HOME}/.npm-packages"
+
