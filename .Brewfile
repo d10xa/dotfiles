@@ -1,3 +1,4 @@
+tap "coursier/formulas"
 brew "bat"
 brew "coreutils" # grealpath
 brew "coursier/formulas/coursier"
