@@ -2,3 +2,5 @@
 emulate sh
 . ~/.profile
 emulate zsh
+eval $(/opt/homebrew/bin/brew shellenv)
+
