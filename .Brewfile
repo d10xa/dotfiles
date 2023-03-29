@@ -1,4 +1,5 @@
 tap "coursier/formulas"
+
 brew "bat"
 brew "coreutils" # grealpath
 brew "coursier/formulas/coursier"
@@ -10,6 +11,7 @@ brew "fasd"
 brew "ghq"
 brew "git-cola"
 brew "jq"
+brew "jenv"
 brew "midnight-commander"
 brew "node"
 brew "osx-cpu-temp"
