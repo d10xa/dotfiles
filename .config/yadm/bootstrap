@@ -56,7 +56,10 @@ if [ ! -f $zsh_aliases_exa_dir/zsh-aliases-exa.plugin.zsh ]; then
   git -c advice.detachedHead=false -C $zsh_aliases_exa_dir checkout f6b72da193f03911009cb95e3e2e18e48b918833
 fi
 
-cs setup --env --jvm 11 --yes --apps ammonite,coursier,scala,scalac,sbt,sbt,giter8,scala3,scalafix
+cs java-home --jvm 19 | xargs jenv add
+cs java-home --jvm 11 | xargs jenv add
+cs install \
+  scala-cli,coursier,scala,scalac,sbt,sbt,giter8,scala3,scalafix
 cs install --contrib plantuml
 
 if [ ! -d $(pyenv root)/versions/2.7.18 ]; then
