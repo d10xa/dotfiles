@@ -58,8 +58,14 @@ fi
 
 cs java-home --jvm 19 | xargs jenv add
 cs java-home --jvm 11 | xargs jenv add
-cs install \
-  scala-cli,coursier,scala,scalac,sbt,sbt,giter8,scala3,scalafix
+cs install scala-cli
+cs install coursier
+cs install scala
+cs install scalac
+cs install sbt
+cs install giter8
+cs install scala3
+cs install scalafix
 cs install --contrib plantuml
 
 if [ ! -d $(pyenv root)/versions/2.7.18 ]; then
@@ -70,5 +76,6 @@ if ! [ -x "$(command -v cfv)" ]; then
   $(pyenv root)/versions/2.7.18/bin/pip install cfv
 fi
 
-mkdir "${HOME}/.npm-packages"
+NPM_PACKAGES_DIR="${HOME}/.npm-packages"
+[ -d "$NPM_PACKAGES_DIR" ] || mkdir "$NPM_PACKAGES_DIR"
 

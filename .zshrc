@@ -82,3 +82,4 @@ export PATH="${PATH}:$(python3 -c 'import site; print(site.USER_BASE)')/bin"
 
 export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
+eval "$(cs install --env)"
