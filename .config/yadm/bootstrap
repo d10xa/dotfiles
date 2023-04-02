@@ -25,6 +25,10 @@ if [ "$system_type" = "Darwin" ]; then
 
 fi
 
+if [[ $(sysctl -n machdep.cpu.brand_string) =~ "Apple" ]]; then
+  softwareupdate --install-rosetta --agree-to-license
+fi
+
 if [ "$system_type" = "Linux" ]; then
   
   if [ ! -n "$ZSH_VERSION" ]; then
