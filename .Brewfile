@@ -19,6 +19,7 @@ brew "osx-cpu-temp"
 brew "pngpaste"
 brew "pyenv"
 brew "qrencode"
+brew "raycast"
 brew "rsync"
 brew "rust"
 brew "sphinx-doc" # required by git-cola
