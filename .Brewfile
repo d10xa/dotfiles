@@ -24,6 +24,7 @@ brew "sphinx-doc" # required by git-cola
 brew "the_silver_searcher"
 brew "tig"
 brew "tree"
+brew "wget"
 brew "zbar"
 cask "docker"
 cask "firefox"
