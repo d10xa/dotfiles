@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 set -x
@@ -23,15 +23,13 @@ if [ "$system_type" = "Darwin" ]; then
       -o ~/.iterm2_shell_integration.zsh
   fi
 
-fi
+  if [[ $(sysctl -n machdep.cpu.brand_string) =~ "Apple" ]]; then
+    softwareupdate --install-rosetta --agree-to-license
+  fi
 
-if [[ $(sysctl -n machdep.cpu.brand_string) =~ "Apple" ]]; then
-  softwareupdate --install-rosetta --agree-to-license
-fi
-
-if [ "$system_type" = "Linux" ]; then
+elif [ "$system_type" = "Linux" ]; then
   
-  if [ ! -n "$ZSH_VERSION" ]; then
+  if ! command -v zsh >/dev/null 2>&1; then
     echo 'Install zsh first'
     exit 1
   fi
