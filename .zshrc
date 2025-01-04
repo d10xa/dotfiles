@@ -65,7 +65,7 @@ fi
 
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
-alias cfv="PYENV_VERSION=2.7.18 pyenv exec cfv"
+#alias cfv="PYENV_VERSION=2.7.18 pyenv exec cfv"
 
 # kubernetes
 if [ "$(command -v kubectl)" ]; then
@@ -87,3 +87,6 @@ eval "$(cs install --env)"
 # qr to text (Shift + Control + Command + 4)
 alias qrpaste='zbarimg -q --raw <(pngpaste -)'
 
+
+# Created by `pipx` on 2024-12-05 07:36:59
+export PATH="$PATH:/Users/d10xa/.local/bin"

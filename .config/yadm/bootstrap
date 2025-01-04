@@ -74,9 +74,7 @@ if [ ! -d $(pyenv root)/versions/2.7.18 ]; then
   pyenv install 2.7.18
 fi
 
-if ! [ -x "$(command -v cfv)" ]; then
-  $(pyenv root)/versions/2.7.18/bin/pip install cfv
-fi
+pipx install cfv toms
 
 NPM_PACKAGES_DIR="${HOME}/.npm-packages"
 [ -d "$NPM_PACKAGES_DIR" ] || mkdir "$NPM_PACKAGES_DIR"
