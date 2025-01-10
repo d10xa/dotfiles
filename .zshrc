@@ -23,7 +23,6 @@ plugins=(
   history-substring-search
   fasd
   last-working-dir
-  zsh-aliases-exa
 )
 HISTSIZE=1000000
 SAVEHIST=1000000
