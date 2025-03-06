@@ -67,7 +67,7 @@ elif [ "$system_type" = "Linux" ]; then
   fi
 
   # Install Coursier if not available
-  if ! command -v cs >/dev/null 2>&1; then
+  if ! command -v coursier >/dev/null 2>&1; then
     echo "Installing Coursier"
 
     curl -fLo coursier https://github.com/coursier/launchers/raw/master/coursier &&
