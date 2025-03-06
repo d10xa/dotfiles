@@ -74,7 +74,6 @@ elif [ "$system_type" = "Linux" ]; then
     curl -fLo cs.gz https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz
     gunzip cs.gz
     chmod +x cs
-    rm cs.gz
     mv cs "$HOME/.local/bin/"
     
     export PATH="$HOME/.local/bin:$PATH"
