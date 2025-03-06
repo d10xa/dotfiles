@@ -57,7 +57,7 @@ elif [ "$system_type" = "Linux" ]; then
     mkdir -p "$HOME/.local/bin"
     
     curl -fLo cs https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz
-    gzip -d cs
+    gzip -d cs.gz
     chmod +x cs
     mv cs "$HOME/.local/bin/"
     
