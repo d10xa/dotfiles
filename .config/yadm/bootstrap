@@ -37,7 +37,32 @@ elif [ "$system_type" = "Linux" ]; then
   sudo apt-get update
   sudo apt-get install -y \
     fasd \
-    python3-pip
+    python3-pip \
+    curl \
+    wget \
+    jq \
+    tree \
+    silversearcher-ag \
+    bat \
+    direnv
+
+  if ! command -v jenv >/dev/null 2>&1; then
+    echo "Installing jenv"
+    git clone https://github.com/jenv/jenv.git ~/.jenv
+  fi
+
+  # Install Coursier if not available
+  if ! command -v cs >/dev/null 2>&1; then
+    echo "Installing Coursier"
+    mkdir -p "$HOME/.local/bin"
+    
+    curl -fLo cs https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz
+    gzip -d cs
+    chmod +x cs
+    mv cs "$HOME/.local/bin/"
+    
+    export PATH="$HOME/.local/bin:$PATH"
+  fi
 
 fi
 
