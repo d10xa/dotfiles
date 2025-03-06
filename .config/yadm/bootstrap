@@ -47,8 +47,23 @@ elif [ "$system_type" = "Linux" ]; then
     direnv
 
   if ! command -v jenv >/dev/null 2>&1; then
-    echo "Installing jenv"
-    git clone https://github.com/jenv/jenv.git ~/.jenv
+    echo "Setting up jenv"
+    if [ -d "$HOME/.jenv" ]; then
+      echo "jenv directory exists, updating instead of installing"
+      if [ -d "$HOME/.jenv/.git" ]; then
+        git -C "$HOME/.jenv" pull --ff-only
+      else
+        echo "Warning: $HOME/.jenv exists but is not a git repo. Renaming and reinstalling"
+        mv "$HOME/.jenv" "$HOME/.jenv.bak.$(date +%Y%m%d%H%M%S)"
+        git clone https://github.com/jenv/jenv.git "$HOME/.jenv"
+      fi
+    else
+      git clone https://github.com/jenv/jenv.git "$HOME/.jenv"
+    fi
+    
+    # Ensure jenv is in PATH for this session
+    export PATH="$HOME/.jenv/bin:$PATH"
+    eval "$(jenv init -)"
   fi
 
   # Install Coursier if not available
