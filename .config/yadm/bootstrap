@@ -69,16 +69,14 @@ elif [ "$system_type" = "Linux" ]; then
   # Install Coursier if not available
   if ! command -v cs >/dev/null 2>&1; then
     echo "Installing Coursier"
-    
+
     curl -fLo coursier https://github.com/coursier/launchers/raw/master/coursier &&
     chmod +x coursier &&
     ./coursier
     
     ./coursier setup --yes --install-dir="$HOME/.local/bin"
-    
-    rm coursier
-    
-    export PATH="$HOME/.local/bin:$PATH"
+        
+    export PATH="$PATH:$HOME/.local/share/coursier/bin"
   fi
 
 fi
@@ -100,17 +98,17 @@ if [ ! -f $zsh_aliases_exa_dir/zsh-aliases-exa.plugin.zsh ]; then
   git -c advice.detachedHead=false -C $zsh_aliases_exa_dir checkout f6b72da193f03911009cb95e3e2e18e48b918833
 fi
 
-cs java-home --jvm 19 | xargs jenv add
-cs java-home --jvm 11 | xargs jenv add
-cs install scala-cli
-cs install coursier
-cs install scala
-cs install scalac
-cs install sbt
-cs install giter8
-cs install scala3
-cs install scalafix
-cs install --contrib plantuml
+coursier java-home --jvm 19 | xargs jenv add
+coursier java-home --jvm 11 | xargs jenv add
+coursier install scala-cli
+coursier install coursier
+coursier install scala
+coursier install scalac
+coursier install sbt
+coursier install giter8
+coursier install scala3
+coursier install scalafix
+coursier install --contrib plantuml
 
 if [ ! -d $(pyenv root)/versions/2.7.18 ]; then
   pyenv install 2.7.18

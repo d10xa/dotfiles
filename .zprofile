@@ -15,4 +15,4 @@ export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 
 export PATH="$PATH:$HOME/.local/bin"
-
+export PATH="$PATH:$HOME/.local/share/coursier/bin"
