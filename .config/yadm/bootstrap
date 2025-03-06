@@ -69,10 +69,10 @@ elif [ "$system_type" = "Linux" ]; then
   # Install Coursier if not available
   if ! command -v cs >/dev/null 2>&1; then
     echo "Installing Coursier"
-    mkdir -p "$HOME/.local/bin"
     
-    curl -fLo coursier https://github.com/coursier/launchers/raw/master/coursier
-    chmod +x coursier
+    curl -fLo coursier https://github.com/coursier/launchers/raw/master/coursier &&
+    chmod +x coursier &&
+    ./coursier
     
     ./coursier setup --yes --install-dir="$HOME/.local/bin"
     
