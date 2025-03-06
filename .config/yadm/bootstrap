@@ -71,8 +71,7 @@ elif [ "$system_type" = "Linux" ]; then
     echo "Installing Coursier"
 
     curl -fLo coursier https://github.com/coursier/launchers/raw/master/coursier &&
-    chmod +x coursier &&
-    ./coursier
+    chmod +x coursier
     
     ./coursier setup --yes
         
