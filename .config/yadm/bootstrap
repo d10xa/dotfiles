@@ -74,7 +74,7 @@ elif [ "$system_type" = "Linux" ]; then
     chmod +x coursier &&
     ./coursier
     
-    ./coursier setup --yes --install-dir="$HOME/.local/bin"
+    ./coursier setup --yes
         
     export PATH="$PATH:$HOME/.local/share/coursier/bin"
   fi
