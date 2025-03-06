@@ -71,10 +71,12 @@ elif [ "$system_type" = "Linux" ]; then
     echo "Installing Coursier"
     mkdir -p "$HOME/.local/bin"
     
-    curl -fLo cs.gz https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz
-    gunzip cs.gz
-    chmod +x cs
-    mv cs "$HOME/.local/bin/"
+    curl -fLo coursier https://github.com/coursier/launchers/raw/master/coursier
+    chmod +x coursier
+    
+    ./coursier setup --yes --install-dir="$HOME/.local/bin"
+    
+    rm coursier
     
     export PATH="$HOME/.local/bin:$PATH"
   fi
