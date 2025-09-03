@@ -18,6 +18,12 @@ if [ "$system_type" = "Darwin" ]; then
     brew bundle --global
   fi
 
+  # Setup fzf key bindings and fuzzy completion
+  if command -v fzf >/dev/null 2>&1 && ! [ -f "$HOME/.fzf.zsh" ]; then
+    echo "Setting up fzf shell integration"
+    $(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
+  fi
+
   if [ ! -f "$HOME/.iterm2_shell_integration.zsh" ]; then
     curl -L https://iterm2.com/shell_integration/zsh \
       -o ~/.iterm2_shell_integration.zsh
@@ -44,7 +50,8 @@ elif [ "$system_type" = "Linux" ]; then
     tree \
     silversearcher-ag \
     bat \
-    direnv
+    direnv \
+    fzf
 
   if ! command -v jenv >/dev/null 2>&1; then
     echo "Setting up jenv"
