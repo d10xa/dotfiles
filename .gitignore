@@ -6,3 +6,7 @@
 /Movies
 /Music
 /Pictures
+.scala-build/
+.idea/
+.bsp/
+project-knowledge.txt
