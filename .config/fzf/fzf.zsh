@@ -3,6 +3,14 @@
 # Setup fzf
 # ---------
 system_type=$(uname -s)
+
+# Determine sed extended regex flag based on system
+if [[ "$system_type" == "Darwin" ]]; then
+    SED_EXTENDED_FLAG="-E"
+else
+    SED_EXTENDED_FLAG="-r"
+fi
+
 if [ "$system_type" = "Darwin" ]; then
   # macOS with homebrew
   if [[ -f ~/.fzf.zsh ]]; then
@@ -60,48 +68,90 @@ elif command -v rg >/dev/null 2>&1; then
 fi
 
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="find . -type d -not -path '*/\.*' | head -200"
+export FZF_ALT_C_COMMAND="find . -type d -not -path '*/\.*' 2>/dev/null | head -200"
 
 # Custom functions
 # ----------------
 
-# fh - search in command history (FIXED: removed dangerous eval)
+# fh - search in command history
 fh() {
   local cmd
-  cmd=$(fc -l 1 | fzf +s --tac | sed -r 's/ *[0-9]*\*? *//' | sed -r 's/\\/\\\\/g')
+  if command -v fc >/dev/null 2>&1; then
+    cmd=$(fc -l 1 2>/dev/null | fzf +s --tac | sed $SED_EXTENDED_FLAG 's/ *[0-9]*\*? *//' | sed 's/\\/\\\\/g')
+  else
+    cmd=$(history | fzf +s --tac | sed $SED_EXTENDED_FLAG 's/ *[0-9]*\*? *//' | sed 's/\\/\\\\/g')
+  fi
+
   if [[ -n "$cmd" ]]; then
-    print -z "$cmd"  # Put command in ZSH buffer instead of executing directly
+    print -z "$cmd"
   fi
 }
 
-# fd - cd to selected directory (FIXED: better path handling)
+# fd - cd to selected directory
 fd() {
   local dir
   local search_path="${1:-.}"
+
+  # Validate search path exists and is a directory
+  if [[ ! -d "$search_path" ]]; then
+    echo "Error: '$search_path' is not a valid directory" >&2
+    return 1
+  fi
+
   dir=$(find "$search_path" -path '*/\.*' -prune \
-                  -o -type d -print 2> /dev/null | fzf +m) &&
-  [[ -n "$dir" ]] && cd "$dir"
+                  -o -type d -print 2>/dev/null | fzf +m)
+
+  if [[ -n "$dir" && -d "$dir" ]]; then
+    cd "$dir"
+  elif [[ -n "$dir" ]]; then
+    echo "Error: Selected path is not a directory" >&2
+    return 1
+  fi
 }
 
-# fda - including hidden directories (FIXED: better path handling)
+# fda - including hidden directories
 fda() {
   local dir
   local search_path="${1:-.}"
-  dir=$(find "$search_path" -type d 2> /dev/null | fzf +m) &&
-  [[ -n "$dir" ]] && cd "$dir"
+
+  # Validate search path exists and is a directory
+  if [[ ! -d "$search_path" ]]; then
+    echo "Error: '$search_path' is not a valid directory" >&2
+    return 1
+  fi
+
+  dir=$(find "$search_path" -type d 2>/dev/null | fzf +m)
+
+  if [[ -n "$dir" && -d "$dir" ]]; then
+    cd "$dir"
+  elif [[ -n "$dir" ]]; then
+    echo "Error: Selected path is not a directory" >&2
+    return 1
+  fi
 }
 
-# fe - open file in editor (FIXED: better file handling)
+# fe - open file in editor
 fe() {
+  local IFS=$'\n'  # Local IFS to avoid global modification
   local files
-  IFS=$'\n' files=($(fzf-tmux --query="${1:-}" --multi --select-1 --exit-0))
-  [[ ${#files[@]} -gt 0 ]] && "${EDITOR:-vim}" "${files[@]}"
+  files=($(fzf-tmux --query="${1:-}" --multi --select-1 --exit-0))
+
+  if [[ ${#files[@]} -gt 0 ]]; then
+    # Validate all selected files exist
+    local file
+    for file in "${files[@]}"; do
+      if [[ ! -f "$file" ]]; then
+        echo "Warning: File '$file' does not exist" >&2
+      fi
+    done
+    "${EDITOR:-vim}" "${files[@]}"
+  fi
 }
 
-# fkill - kill process (FIXED: safer PID handling)
+# fkill - kill process
 fkill() {
-  local pid signal
-  signal="${1:-9}"
+  local signal="${1:-9}"
+  local pids
 
   # Validate signal is numeric
   if [[ ! "$signal" =~ ^[0-9]+$ ]]; then
@@ -109,100 +159,190 @@ fkill() {
     return 1
   fi
 
-  pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+  # Get process selection
+  local ps_output
+  ps_output=$(ps -ef | sed 1d | fzf -m --header="Select processes to kill (TAB for multi-select)")
 
-  if [[ -n "$pid" ]]; then
-    # Validate PID is numeric
-    if [[ "$pid" =~ ^[0-9]+$ ]]; then
-      printf '%s\n' "$pid" | xargs kill "-$signal"
+  if [[ -z "$ps_output" ]]; then
+    return 0
+  fi
+
+  # Extract PIDs and validate them
+  local IFS=$'\n'
+  local lines=($ps_output)
+  local valid_pids=()
+
+  for line in "${lines[@]}"; do
+    local pid=$(echo "$line" | awk '{print $2}')
+    if [[ "$pid" =~ ^[0-9]+$ ]] && [[ "$pid" -ne $$ ]]; then  # Don't allow killing current shell
+      valid_pids+=("$pid")
     else
-      echo "Error: Invalid PID selected" >&2
+      echo "Warning: Skipping invalid or dangerous PID: $pid" >&2
+    fi
+  done
+
+  if [[ ${#valid_pids[@]} -gt 0 ]]; then
+    printf 'About to kill %d process(es) with signal %s:\n' "${#valid_pids[@]}" "$signal"
+    printf '  PID: %s\n' "${valid_pids[@]}"
+    printf 'Continue? (y/N): '
+    read -r confirmation
+    if [[ "$confirmation" =~ ^[Yy]$ ]]; then
+      printf '%s\n' "${valid_pids[@]}" | xargs kill "-$signal"
+    else
+      echo "Cancelled."
+    fi
+  else
+    echo "No valid PIDs selected" >&2
+    return 1
+  fi
+}
+
+# Git functions with fzf
+# ----------------------
+
+# fbr - checkout git branch
+fbr() {
+  # Check if we're in a git repository
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "Error: Not in a git repository" >&2
+    return 1
+  fi
+
+  local branches branch branch_name
+  branches=$(git --no-pager branch -vv 2>/dev/null) || {
+    echo "Error: Failed to get git branches" >&2
+    return 1
+  }
+
+  branch=$(echo "$branches" | fzf +m)
+  if [[ -n "$branch" ]]; then
+    branch_name=$(echo "$branch" | awk '{print $1}' | sed 's/^[* ]*//')
+    if [[ -n "$branch_name" ]]; then
+      git checkout "$branch_name"
+    fi
+  fi
+}
+
+# fco - checkout git commit
+fco() {
+  # Check if we're in a git repository
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "Error: Not in a git repository" >&2
+    return 1
+  fi
+
+  local commits commit commit_hash
+  commits=$(git log --pretty=oneline --abbrev-commit --reverse 2>/dev/null) || {
+    echo "Error: Failed to get git log" >&2
+    return 1
+  }
+
+  commit=$(echo "$commits" | fzf --tac +s +m -e)
+  if [[ -n "$commit" ]]; then
+    commit_hash=$(echo "$commit" | awk '{print $1}')
+    if [[ -n "$commit_hash" && "$commit_hash" =~ ^[a-f0-9]+$ ]]; then
+      git checkout "$commit_hash"
+    else
+      echo "Error: Invalid commit hash" >&2
       return 1
     fi
   fi
 }
 
-# Git functions with fzf (FIXED: better error handling)
-# ----------------------
-
-# fbr - checkout git branch
-fbr() {
-  local branches branch
-  branches=$(git --no-pager branch -vv 2>/dev/null) || {
-    echo "Error: Not in a git repository" >&2
-    return 1
-  }
-  branch=$(echo "$branches" | fzf +m) &&
-  [[ -n "$branch" ]] &&
-  git checkout $(echo "$branch" | awk '{print $1}' | sed "s/.* //")
-}
-
-# fco - checkout git commit
-fco() {
-  local commits commit
-  commits=$(git log --pretty=oneline --abbrev-commit --reverse 2>/dev/null) || {
-    echo "Error: Not in a git repository" >&2
-    return 1
-  }
-  commit=$(echo "$commits" | fzf --tac +s +m -e) &&
-  [[ -n "$commit" ]] &&
-  git checkout $(echo "$commit" | sed "s/ .*//")
-}
-
-# fshow - git commit browser (FIXED: safer execution)
+# fshow - git commit browser
 fshow() {
+  # Check if we're in a git repository
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "Error: Not in a git repository" >&2
+    return 1
+  fi
+
   git log --graph --color=always \
       --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" 2>/dev/null |
   fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
       --bind "ctrl-m:execute:
-                (grep -o '[a-f0-9]\{7\}' | head -1 |
+                (grep -o '[a-f0-9]\{7,\}' | head -1 |
                 xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
                 {}
 FZF-EOF" || {
-    echo "Error: Not in a git repository or no commits found" >&2
+    echo "Error: Failed to get git log" >&2
     return 1
   }
 }
 
-# Docker functions with fzf (FIXED: better validation)
+# Docker functions with fzf
 # ---------------------------------------------------
 if command -v docker >/dev/null 2>&1; then
+  # Helper function to validate container ID
+  _validate_container_id() {
+    local cid="$1"
+    # Docker container IDs are hexadecimal and can be 12 or 64 characters
+    [[ "$cid" =~ ^[a-f0-9]{12}([a-f0-9]{52})?$ ]]
+  }
+
   # Select a docker container to start and attach to
-  da() {
+  fda_docker() {
     local cid
+    if ! docker ps -a >/dev/null 2>&1; then
+      echo "Error: Cannot access Docker daemon" >&2
+      return 1
+    fi
+
     cid=$(docker ps -a 2>/dev/null | sed 1d | fzf -1 -q "${1:-}" | awk '{print $1}')
 
-    if [[ -n "$cid" && "$cid" =~ ^[a-f0-9]+$ ]]; then
-      docker start "$cid" && docker attach "$cid"
-    elif [[ -n "$cid" ]]; then
-      echo "Error: Invalid container ID" >&2
-      return 1
+    if [[ -n "$cid" ]]; then
+      if _validate_container_id "$cid"; then
+        docker start "$cid" && docker attach "$cid"
+      else
+        echo "Error: Invalid container ID format" >&2
+        return 1
+      fi
     fi
   }
 
   # Select a running docker container to stop
-  ds() {
+  fds_docker() {
     local cid
+    if ! docker ps >/dev/null 2>&1; then
+      echo "Error: Cannot access Docker daemon" >&2
+      return 1
+    fi
+
     cid=$(docker ps 2>/dev/null | sed 1d | fzf -q "${1:-}" | awk '{print $1}')
 
-    if [[ -n "$cid" && "$cid" =~ ^[a-f0-9]+$ ]]; then
-      docker stop "$cid"
-    elif [[ -n "$cid" ]]; then
-      echo "Error: Invalid container ID" >&2
-      return 1
+    if [[ -n "$cid" ]]; then
+      if _validate_container_id "$cid"; then
+        docker stop "$cid"
+      else
+        echo "Error: Invalid container ID format" >&2
+        return 1
+      fi
     fi
   }
 
   # Select a docker container to remove
-  drm() {
+  fdrm_docker() {
     local cid
+    if ! docker ps -a >/dev/null 2>&1; then
+      echo "Error: Cannot access Docker daemon" >&2
+      return 1
+    fi
+
     cid=$(docker ps -a 2>/dev/null | sed 1d | fzf -q "${1:-}" | awk '{print $1}')
 
-    if [[ -n "$cid" && "$cid" =~ ^[a-f0-9]+$ ]]; then
-      docker rm "$cid"
-    elif [[ -n "$cid" ]]; then
-      echo "Error: Invalid container ID" >&2
-      return 1
+    if [[ -n "$cid" ]]; then
+      if _validate_container_id "$cid"; then
+        printf 'Remove container %s? (y/N): ' "$cid"
+        read -r confirmation
+        if [[ "$confirmation" =~ ^[Yy]$ ]]; then
+          docker rm "$cid"
+        else
+          echo "Cancelled."
+        fi
+      else
+        echo "Error: Invalid container ID format" >&2
+        return 1
+      fi
     fi
   }
 fi
