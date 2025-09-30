@@ -115,11 +115,8 @@ else
   git -C $powerlevel10k_dir pull --ff-only
 fi
 
-# Install eza aliases plugin (updated for eza instead of exa)
-zsh_aliases_eza_dir=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-aliases-eza
-if [ ! -f $zsh_aliases_eza_dir/zsh-aliases-eza.plugin.zsh ]; then
-  git clone https://github.com/DarrinTisdale/zsh-aliases-eza.git $zsh_aliases_eza_dir
-fi
+# Note: Using manual eza aliases in .zshrc instead of a plugin
+# since there's no official eza aliases plugin yet
 
 coursier java-home --jvm 19 | xargs jenv add
 coursier java-home --jvm 11 | xargs jenv add

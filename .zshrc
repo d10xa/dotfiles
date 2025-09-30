@@ -23,7 +23,6 @@ plugins=(
   history-substring-search
   fasd
   last-working-dir
-  zsh-aliases-eza
 )
 HISTSIZE=1000000
 SAVEHIST=1000000
@@ -100,14 +99,22 @@ eval "$(cs install --env)"
 
 # File listing tools - support both exa and eza during transition
 if command -v eza &> /dev/null; then
-  # eza is installed, zsh-aliases-eza plugin will handle aliases
-  :  # no-op
+  # Modern file listing with eza
+  alias ls='eza --color=auto --group-directories-first'
+  alias ll='eza -l --color=auto --group-directories-first'
+  alias la='eza -la --color=auto --group-directories-first'
+  alias lt='eza --tree --color=auto'
+  alias lT='eza --tree --color=auto --level=2'
+  alias lg='eza -l --color=auto --group-directories-first --git'
+  alias l='eza --color=auto --group-directories-first'
 elif command -v exa &> /dev/null; then
   # Fallback to exa if eza not installed yet
-  alias ls='exa'
-  alias ll='exa -l'
-  alias la='exa -la'
-  alias tree='exa --tree'
+  alias ls='exa --color=auto --group-directories-first'
+  alias ll='exa -l --color=auto --group-directories-first'
+  alias la='exa -la --color=auto --group-directories-first'
+  alias lt='exa --tree --color=auto'
+  alias lg='exa -l --color=auto --group-directories-first --git'
+  alias l='exa --color=auto --group-directories-first'
 fi
 
 # qr to text (Shift + Control + Command + 4)
