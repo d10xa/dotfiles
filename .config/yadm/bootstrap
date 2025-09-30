@@ -18,6 +18,15 @@ if [ "$system_type" = "Darwin" ]; then
     brew bundle --global
   fi
 
+  # Migrate from fasd to zoxide if needed
+  if command -v zoxide >/dev/null 2>&1 && [ -f "$HOME/.fasd" ] && [ ! -f "$HOME/.zoxide_migrated" ]; then
+    echo "Migrating from fasd to zoxide"
+    if [ -x "$HOME/bin/migrate-fasd-to-zoxide.sh" ]; then
+      "$HOME/bin/migrate-fasd-to-zoxide.sh"
+      touch "$HOME/.zoxide_migrated"
+    fi
+  fi
+
   # Setup fzf key bindings and fuzzy completion
   if command -v fzf >/dev/null 2>&1 && ! [ -f "$HOME/.fzf.zsh" ]; then
     echo "Setting up fzf shell integration"

@@ -54,12 +54,22 @@ if [ -f "$HOME/.zshrc_local" ]; then
   source "$HOME/.zshrc_local"
 fi
 
-fasd_cache="$HOME/.fasd-init-zsh"
-if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
-  fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install >| "$fasd_cache"
+# Directory jumping tool
+# Migrating from fasd to zoxide - both will work during transition
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init zsh)"
+  # Compatibility aliases for muscle memory
+  alias j='z'    # jump to directory
+  alias ji='zi'  # interactive selection with fzf
+elif command -v fasd &> /dev/null; then
+  # Fallback to fasd if zoxide not installed yet
+  fasd_cache="$HOME/.fasd-init-zsh"
+  if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
+    fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install >| "$fasd_cache"
+  fi
+  source "$fasd_cache"
+  unset fasd_cache
 fi
-source "$fasd_cache"
-unset fasd_cache
 if ! command -v terraform &> /dev/null
 then
 else

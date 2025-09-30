@@ -4,7 +4,8 @@ brew "bat"
 brew "coreutils" # grealpath
 brew "coursier/formulas/coursier"
 brew "curl"
-brew "d10xa/formulas/fasd"
+# brew "d10xa/formulas/fasd" # Replaced by zoxide
+brew "zoxide"
 brew "direnv"
 brew "exa"
 brew "exiftool"
