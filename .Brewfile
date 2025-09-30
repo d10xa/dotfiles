@@ -7,7 +7,8 @@ brew "curl"
 # brew "d10xa/formulas/fasd" # Replaced by zoxide
 brew "zoxide"
 brew "direnv"
-brew "exa"
+# brew "exa" # Project archived, replaced by eza
+brew "eza"
 brew "exiftool"
 brew "fzf"
 brew "ghq"

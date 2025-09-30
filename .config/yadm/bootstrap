@@ -51,7 +51,6 @@ elif [ "$system_type" = "Linux" ]; then
 
   sudo apt-get update
   sudo apt-get install -y \
-    fasd \
     python3-pip \
     curl \
     wget \
@@ -61,6 +60,15 @@ elif [ "$system_type" = "Linux" ]; then
     bat \
     direnv \
     fzf
+
+  # Install modern tools via cargo if available
+  if command -v cargo >/dev/null 2>&1; then
+    cargo install eza zoxide
+  else
+    echo "Warning: cargo not found, install eza and zoxide manually"
+    echo "For eza: https://github.com/eza-community/eza/blob/main/INSTALL.md"
+    echo "For zoxide: https://github.com/ajeetdsouza/zoxide/releases"
+  fi
 
   if ! command -v jenv >/dev/null 2>&1; then
     echo "Setting up jenv"
@@ -107,10 +115,10 @@ else
   git -C $powerlevel10k_dir pull --ff-only
 fi
 
-zsh_aliases_exa_dir=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-aliases-exa
-if [ ! -f $zsh_aliases_exa_dir/zsh-aliases-exa.plugin.zsh ]; then
-  git clone --no-checkout https://github.com/DarrinTisdale/zsh-aliases-exa.git $zsh_aliases_exa_dir
-  git -c advice.detachedHead=false -C $zsh_aliases_exa_dir checkout f6b72da193f03911009cb95e3e2e18e48b918833
+# Install eza aliases plugin (updated for eza instead of exa)
+zsh_aliases_eza_dir=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-aliases-eza
+if [ ! -f $zsh_aliases_eza_dir/zsh-aliases-eza.plugin.zsh ]; then
+  git clone https://github.com/DarrinTisdale/zsh-aliases-eza.git $zsh_aliases_eza_dir
 fi
 
 coursier java-home --jvm 19 | xargs jenv add

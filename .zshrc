@@ -23,6 +23,7 @@ plugins=(
   history-substring-search
   fasd
   last-working-dir
+  zsh-aliases-eza
 )
 HISTSIZE=1000000
 SAVEHIST=1000000
@@ -96,6 +97,18 @@ export PATH="${PATH}:$(python3 -c 'import site; print(site.USER_BASE)')/bin"
 export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
 eval "$(cs install --env)"
+
+# File listing tools - support both exa and eza during transition
+if command -v eza &> /dev/null; then
+  # eza is installed, zsh-aliases-eza plugin will handle aliases
+  :  # no-op
+elif command -v exa &> /dev/null; then
+  # Fallback to exa if eza not installed yet
+  alias ls='exa'
+  alias ll='exa -l'
+  alias la='exa -la'
+  alias tree='exa --tree'
+fi
 
 # qr to text (Shift + Control + Command + 4)
 alias qrpaste='zbarimg -q --raw <(pngpaste -)'
