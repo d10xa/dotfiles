@@ -103,3 +103,4 @@ alias qrpaste='zbarimg -q --raw <(pngpaste -)'
 
 # Created by `pipx` on 2024-12-05 07:36:59
 export PATH="$PATH:/Users/d10xa/.local/bin"
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
