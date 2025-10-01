@@ -56,18 +56,20 @@ elif [ "$system_type" = "Linux" ]; then
     wget \
     jq \
     tree \
-    silversearcher-ag \
     bat \
     direnv \
     fzf
 
   # Install modern tools via cargo if available
   if command -v cargo >/dev/null 2>&1; then
-    cargo install eza zoxide
+    cargo install eza zoxide ripgrep
   else
-    echo "Warning: cargo not found, install eza and zoxide manually"
+    echo "Warning: cargo not found, install modern tools manually"
     echo "For eza: https://github.com/eza-community/eza/blob/main/INSTALL.md"
     echo "For zoxide: https://github.com/ajeetdsouza/zoxide/releases"
+    echo "For ripgrep: https://github.com/BurntSushi/ripgrep/releases"
+    # Fallback to apt for ripgrep if available
+    sudo apt-get install -y ripgrep || echo "ripgrep not available in apt, install manually"
   fi
 
   if ! command -v jenv >/dev/null 2>&1; then

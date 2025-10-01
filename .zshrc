@@ -117,6 +117,21 @@ elif command -v exa &> /dev/null; then
   alias l='exa --color=auto --group-directories-first'
 fi
 
+# Search tools - migrate from ag to ripgrep
+if command -v rg &> /dev/null; then
+  # ag deprecation warning - encourage migration to rg
+  ag() {
+    echo "⚠️  'ag' is deprecated. Use 'rg' (ripgrep) instead:" >&2
+    echo "   rg has the same syntax but is faster and more feature-rich" >&2
+    echo "   Running 'rg $*' for you this time..." >&2
+    echo "" >&2
+    rg "$@"
+  }
+elif command -v ag &> /dev/null; then
+  # ag (the_silver_searcher) still available
+  :  # no-op
+fi
+
 # qr to text (Shift + Control + Command + 4)
 alias qrpaste='zbarimg -q --raw <(pngpaste -)'
 
