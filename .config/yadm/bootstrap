@@ -10,7 +10,7 @@ if [ "$system_type" = "Darwin" ]; then
   # install homebrew if it's missing
   if ! command -v brew >/dev/null 2>&1; then
     echo "Installing homebrew"
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
 
   if [ -f "$HOME/.Brewfile" ]; then
@@ -106,19 +106,7 @@ elif [ "$system_type" = "Linux" ]; then
 
 fi
 
-if [ ! -f "$HOME/.oh-my-zsh/README.md" ]; then
-  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-fi
-
-powerlevel10k_dir=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-if [ ! -d $powerlevel10k_dir ]; then
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $powerlevel10k_dir
-else
-  git -C $powerlevel10k_dir pull --ff-only
-fi
-
-# Note: Using manual eza aliases in .zshrc instead of a plugin
-# since there's no official eza aliases plugin yet
+# Zinit and Powerlevel10k are installed automatically by .zshrc on first run
 
 coursier java-home --jvm 19 | xargs jenv add
 coursier java-home --jvm 11 | xargs jenv add
@@ -131,10 +119,6 @@ coursier install giter8
 coursier install scala3
 coursier install scalafix
 coursier install --contrib plantuml
-
-if [ ! -d $(pyenv root)/versions/2.7.18 ]; then
-  pyenv install 2.7.18
-fi
 
 pipx install cfv toms
 

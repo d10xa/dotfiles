@@ -202,17 +202,6 @@ elif (( $+commands[exa] )); then
   alias l='exa --color=auto --group-directories-first'
 fi
 
-# Search tools - migrate from ag to ripgrep
-if (( $+commands[rg] )); then
-  ag() {
-    echo "Warning: 'ag' is deprecated. Use 'rg' (ripgrep) instead:" >&2
-    echo "   rg has the same syntax but is faster and more feature-rich" >&2
-    echo "   Running 'rg $*' for you this time..." >&2
-    echo "" >&2
-    rg "$@"
-  }
-fi
-
 # QR to text (Shift + Control + Command + 4)
 alias qrpaste='zbarimg -q --raw <(pngpaste -)'
 
@@ -224,9 +213,6 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 export PATH="$HOME/.npm-packages/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
-
-# Python user packages (static path to avoid python3 call on every shell start)
-export PATH="${PATH}:${HOME}/.local/bin"
 
 # =============================================================================
 # External configs
