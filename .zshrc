@@ -85,9 +85,6 @@ zinit light zsh-users/zsh-autosuggestions
 zinit ice wait"1" lucid
 zinit snippet OMZP::git
 
-zinit ice wait"1" lucid if"[[ $OSTYPE == darwin* ]]"
-zinit snippet OMZP::macos
-
 zinit ice wait"1" lucid
 zinit snippet OMZP::docker
 
@@ -148,6 +145,36 @@ if (( $+commands[cs] )); then
   cs()        { _cs_lazy_init && command cs "$@" }
   scala()     { _cs_lazy_init && command scala "$@" }
   scala-cli() { _cs_lazy_init && command scala-cli "$@" }
+fi
+
+# =============================================================================
+# macOS functions (replacement for OMZP::macos)
+# =============================================================================
+
+if [[ "$OSTYPE" == darwin* ]]; then
+  # Open current directory in Finder
+  ofd() { open "$PWD" }
+
+  # cd to frontmost Finder window directory
+  cdf() {
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')" || return
+  }
+
+  # Return path of frontmost Finder window
+  pfd() {
+    osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)'
+  }
+
+  # Return paths of selected Finder items
+  pfs() {
+    osascript -e 'tell app "Finder" to POSIX path of (selection as alias)'
+  }
+
+  # Quick Look a file
+  quick-look() { qlmanage -p "$@" &>/dev/null }
+
+  # Open man page in Preview
+  man-preview() { man -t "$@" | open -f -a Preview }
 fi
 
 # =============================================================================
