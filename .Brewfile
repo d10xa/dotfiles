@@ -25,7 +25,8 @@ brew "qrencode"
 brew "rsync"
 brew "rust"
 brew "sphinx-doc" # required by git-cola
-brew "the_silver_searcher"
+# brew "the_silver_searcher" # Replaced by ripgrep
+brew "ripgrep"
 brew "tig"
 brew "tree"
 brew "wget"

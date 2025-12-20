@@ -9,97 +9,156 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 (( ${+commands[direnv]} )) && emulate zsh -c "$(direnv hook zsh)"
 
-export ZSH="$HOME/.oh-my-zsh"
-# https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
-HIST_STAMPS="yyyy-mm-dd"
-# https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins
-plugins=(
-  git
-  macos
-  docker
-  docker-compose
-  vi-mode
-  history-substring-search
-  fasd
-  last-working-dir
-)
-HISTSIZE=1000000
-SAVEHIST=1000000
-# https://unix.stackexchange.com/questions/273861/unlimited-history-in-zsh
-setopt EXTENDED_HISTORY # Write the history file in the ":start:elapsed;command" format.
-setopt INC_APPEND_HISTORY # Write to the history file immediately, not when the shell exits.
-setopt SHARE_HISTORY # Share history between all sessions.
-setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicate entries first when trimming history.
-setopt HIST_IGNORE_DUPS # Don't record an entry that was just recorded again.
-setopt HIST_IGNORE_ALL_DUPS # Delete old recorded entry if new entry is a duplicate.
-setopt HIST_IGNORE_SPACE # Don't record an entry starting with a space.
-setopt HIST_FIND_NO_DUPS # Do not display a line previously found.
-setopt HIST_SAVE_NO_DUPS # Don't write duplicate entries in the history file.
-setopt HIST_REDUCE_BLANKS # Remove superfluous blanks before recording entry.
-source $ZSH/oh-my-zsh.sh
-system_type=$(uname -s)
-if [ "$system_type" = "Darwin" ]; then
-  # https://iterm2.com/documentation-shell-integration.html
-  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+# =============================================================================
+# Zinit
+# =============================================================================
+
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+
+# Download Zinit if not present
+if [[ ! -d "$ZINIT_HOME" ]]; then
+  print -P "%F{33}Installing Zinit...%f"
+  command mkdir -p "$(dirname $ZINIT_HOME)"
+  command git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
+
+source "${ZINIT_HOME}/zinit.zsh"
+
+# =============================================================================
+# Powerlevel10k (must load synchronously for instant prompt)
+# =============================================================================
+
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-if [[ -f ~/.config/fzf/fzf.zsh ]]; then
-  source ~/.config/fzf/fzf.zsh
-fi
+# =============================================================================
+# History settings
+# =============================================================================
 
-if [ -f "$HOME/.zshrc_local" ]; then
-  source "$HOME/.zshrc_local"
-fi
+HISTSIZE=1000000
+SAVEHIST=1000000
+HIST_STAMPS="yyyy-mm-dd"
 
-# Directory jumping tool
-# Migrating from fasd to zoxide - both will work during transition
-if command -v zoxide &> /dev/null; then
-  eval "$(zoxide init zsh)"
-  # Compatibility aliases for muscle memory
-  alias j='z'    # jump to directory
-  alias ji='zi'  # interactive selection with fzf
-elif command -v fasd &> /dev/null; then
-  # Fallback to fasd if zoxide not installed yet
-  fasd_cache="$HOME/.fasd-init-zsh"
-  if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
-    fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install >| "$fasd_cache"
+setopt EXTENDED_HISTORY       # Write the history file in the ":start:elapsed;command" format.
+setopt INC_APPEND_HISTORY     # Write to the history file immediately, not when the shell exits.
+setopt SHARE_HISTORY          # Share history between all sessions.
+setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicate entries first when trimming history.
+setopt HIST_IGNORE_DUPS       # Don't record an entry that was just recorded again.
+setopt HIST_IGNORE_ALL_DUPS   # Delete old recorded entry if new entry is a duplicate.
+setopt HIST_IGNORE_SPACE      # Don't record an entry starting with a space.
+setopt HIST_FIND_NO_DUPS      # Do not display a line previously found.
+setopt HIST_SAVE_NO_DUPS      # Don't write duplicate entries in the history file.
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks before recording entry.
+
+# =============================================================================
+# Turbo mode plugins (wait"0" - load immediately after prompt)
+# =============================================================================
+
+# Vi-mode
+zinit ice wait"0" lucid
+zinit light jeffreytse/zsh-vi-mode
+
+# History substring search
+zinit ice wait"0" lucid atload"
+  bindkey '^[[A' history-substring-search-up
+  bindkey '^[[B' history-substring-search-down
+  bindkey -M vicmd 'k' history-substring-search-up
+  bindkey -M vicmd 'j' history-substring-search-down
+"
+zinit light zsh-users/zsh-history-substring-search
+
+# Syntax highlighting
+zinit ice wait"0" lucid atinit"zicompinit; zicdreplay"
+zinit light zdharma-continuum/fast-syntax-highlighting
+
+# Autosuggestions
+zinit ice wait"0" lucid atload"_zsh_autosuggest_start"
+zinit light zsh-users/zsh-autosuggestions
+
+# =============================================================================
+# Oh My Zsh snippets (wait"1" - load after initial plugins)
+# =============================================================================
+
+zinit ice wait"1" lucid
+zinit snippet OMZP::git
+
+zinit ice wait"1" lucid if"[[ $OSTYPE == darwin* ]]"
+zinit snippet OMZP::macos
+
+zinit ice wait"1" lucid
+zinit snippet OMZP::docker
+
+zinit ice wait"1" lucid
+zinit snippet OMZP::docker-compose
+
+zinit ice wait"1" lucid
+zinit snippet OMZP::last-working-dir
+
+# =============================================================================
+# Lazy loading tools (wait"2")
+# =============================================================================
+
+# Zoxide (directory jumper)
+zinit ice wait"2" lucid atload'
+  if (( $+commands[zoxide] )); then
+    eval "$(zoxide init zsh)"
+    alias j="z"
+    alias ji="zi"
   fi
-  source "$fasd_cache"
-  unset fasd_cache
-fi
-if ! command -v terraform &> /dev/null
-then
-else
-  alias tf=terraform
-fi
+'
+zinit light zdharma-continuum/null
 
-export PATH="/usr/local/opt/curl/bin:$PATH"
+# Kubectl completions
+zinit ice wait"2" lucid atload'
+  if (( $+commands[kubectl] )); then
+    source <(kubectl completion zsh)
+    alias k=kubectl
+  fi
+'
+zinit light zdharma-continuum/null
 
-#alias cfv="PYENV_VERSION=2.7.18 pyenv exec cfv"
-
-# kubernetes
-if [ "$(command -v kubectl)" ]; then
-  alias k=kubectl
-  complete -F __start_kubectl k
-  source <(kubectl completion zsh)
-fi
-
-# npm
-export PATH="$HOME/.npm-packages/bin/:$PATH"
-
-# python
-export PATH="${PATH}:$(python3 -c 'import site; print(site.USER_BASE)')/bin"
+# =============================================================================
+# Lazy loading functions (jenv, coursier)
+# =============================================================================
 
 export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
-eval "$(cs install --env)"
+
+# jenv lazy loading - initializes on first java/javac/jenv call
+_jenv_lazy_init() {
+  unfunction java javac jenv 2>/dev/null
+  eval "$(jenv init -)"
+}
+
+if (( $+commands[jenv] )); then
+  java()  { _jenv_lazy_init && command java "$@" }
+  javac() { _jenv_lazy_init && command javac "$@" }
+  jenv()  { _jenv_lazy_init && command jenv "$@" }
+fi
+
+# Coursier lazy loading - initializes on first cs/scala/scala-cli call
+_cs_lazy_init() {
+  unfunction cs scala scala-cli 2>/dev/null
+  eval "$(cs install --env)"
+}
+
+if (( $+commands[cs] )); then
+  cs()        { _cs_lazy_init && command cs "$@" }
+  scala()     { _cs_lazy_init && command scala "$@" }
+  scala-cli() { _cs_lazy_init && command scala-cli "$@" }
+fi
+
+# =============================================================================
+# Aliases
+# =============================================================================
+
+# Terraform
+(( $+commands[terraform] )) && alias tf=terraform
 
 # File listing tools - support both exa and eza during transition
-if command -v eza &> /dev/null; then
-  # Modern file listing with eza
+if (( $+commands[eza] )); then
   alias ls='eza --color=auto --group-directories-first'
   alias ll='eza -l --color=auto --group-directories-first'
   alias la='eza -la --color=auto --group-directories-first'
@@ -107,8 +166,7 @@ if command -v eza &> /dev/null; then
   alias lT='eza --tree --color=auto --level=2'
   alias lg='eza -l --color=auto --group-directories-first --git'
   alias l='eza --color=auto --group-directories-first'
-elif command -v exa &> /dev/null; then
-  # Fallback to exa if eza not installed yet
+elif (( $+commands[exa] )); then
   alias ls='exa --color=auto --group-directories-first'
   alias ll='exa -l --color=auto --group-directories-first'
   alias la='exa -la --color=auto --group-directories-first'
@@ -118,24 +176,42 @@ elif command -v exa &> /dev/null; then
 fi
 
 # Search tools - migrate from ag to ripgrep
-if command -v rg &> /dev/null; then
-  # ag deprecation warning - encourage migration to rg
+if (( $+commands[rg] )); then
   ag() {
-    echo "⚠️  'ag' is deprecated. Use 'rg' (ripgrep) instead:" >&2
+    echo "Warning: 'ag' is deprecated. Use 'rg' (ripgrep) instead:" >&2
     echo "   rg has the same syntax but is faster and more feature-rich" >&2
     echo "   Running 'rg $*' for you this time..." >&2
     echo "" >&2
     rg "$@"
   }
-elif command -v ag &> /dev/null; then
-  # ag (the_silver_searcher) still available
-  :  # no-op
 fi
 
-# qr to text (Shift + Control + Command + 4)
+# QR to text (Shift + Control + Command + 4)
 alias qrpaste='zbarimg -q --raw <(pngpaste -)'
 
+# =============================================================================
+# PATH
+# =============================================================================
 
-# Created by `pipx` on 2024-12-05 07:36:59
-export PATH="$PATH:/Users/d10xa/.local/bin"
+export PATH="/usr/local/opt/curl/bin:$PATH"
+export PATH="$HOME/.npm-packages/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+
+# Python user packages (static path to avoid python3 call on every shell start)
+export PATH="${PATH}:${HOME}/.local/bin"
+
+# =============================================================================
+# External configs
+# =============================================================================
+
+# FZF
+[[ -f ~/.config/fzf/fzf.zsh ]] && source ~/.config/fzf/fzf.zsh
+
+# iTerm2 shell integration (macOS only)
+if [[ "$OSTYPE" == darwin* && -e "${HOME}/.iterm2_shell_integration.zsh" ]]; then
+  source "${HOME}/.iterm2_shell_integration.zsh"
+fi
+
+# Local configuration (last, to override anything)
+[[ -f ~/.zshrc_local ]] && source ~/.zshrc_local
