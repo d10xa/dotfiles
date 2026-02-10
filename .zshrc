@@ -62,12 +62,7 @@ zinit ice wait"0" lucid
 zinit light jeffreytse/zsh-vi-mode
 
 # History substring search
-zinit ice wait"0" lucid atload"
-  bindkey '^[[A' history-substring-search-up
-  bindkey '^[[B' history-substring-search-down
-  bindkey -M vicmd 'k' history-substring-search-up
-  bindkey -M vicmd 'j' history-substring-search-down
-"
+zinit ice wait"0" lucid atload"bindkey '^[[A' history-substring-search-up; bindkey '^[[B' history-substring-search-down; bindkey -M vicmd 'k' history-substring-search-up; bindkey -M vicmd 'j' history-substring-search-down"
 zinit light zsh-users/zsh-history-substring-search
 
 # Syntax highlighting
@@ -99,22 +94,11 @@ zinit snippet OMZP::last-working-dir
 # =============================================================================
 
 # Zoxide (directory jumper)
-zinit ice wait"2" lucid atload'
-  if (( $+commands[zoxide] )); then
-    eval "$(zoxide init zsh)"
-    alias j="z"
-    alias ji="zi"
-  fi
-'
+zinit ice wait"2" lucid atload'if (( $+commands[zoxide] )); then eval "$(zoxide init zsh)"; alias j="z"; alias ji="zi"; fi'
 zinit light zdharma-continuum/null
 
 # Kubectl completions
-zinit ice wait"2" lucid atload'
-  if (( $+commands[kubectl] )); then
-    source <(kubectl completion zsh)
-    alias k=kubectl
-  fi
-'
+zinit ice wait"2" lucid atload'if (( $+commands[kubectl] )); then source <(kubectl completion zsh); alias k=kubectl; fi'
 zinit light zdharma-continuum/null
 
 # =============================================================================
