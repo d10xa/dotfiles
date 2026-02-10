@@ -86,7 +86,8 @@ zinit snippet OMZP::docker
 zinit ice wait"1" lucid
 zinit snippet OMZP::docker-compose
 
-zinit ice wait"1" lucid
+# Loaded synchronously: triggers cd on load, which causes chpwd reentrant
+# call to @zinit-scheduler if loaded in turbo mode
 zinit snippet OMZP::last-working-dir
 
 # =============================================================================
