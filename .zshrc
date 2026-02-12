@@ -78,6 +78,9 @@ zinit light zsh-users/zsh-autosuggestions
 # =============================================================================
 
 zinit ice wait"1" lucid
+zinit snippet OMZL::git.zsh
+
+zinit ice wait"1" lucid
 zinit snippet OMZP::git
 
 zinit ice wait"1" lucid
