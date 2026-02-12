@@ -106,21 +106,12 @@ zinit ice wait"2" lucid atload'if (( $+commands[kubectl] )); then source <(kubec
 zinit light zdharma-continuum/null
 
 # =============================================================================
-# Lazy loading functions (jenv, coursier)
+# Lazy loading functions (mise, coursier)
 # =============================================================================
 
-export PATH="$HOME/.jenv/bin:$PATH"
-
-# jenv lazy loading - initializes on first java/javac/jenv call
-_jenv_lazy_init() {
-  unfunction java javac jenv 2>/dev/null
-  eval "$(jenv init -)"
-}
-
-if (( $+commands[jenv] )); then
-  java()  { _jenv_lazy_init && command java "$@" }
-  javac() { _jenv_lazy_init && command javac "$@" }
-  jenv()  { _jenv_lazy_init && command jenv "$@" }
+# mise (replaces jenv for Java version management)
+if (( $+commands[mise] )); then
+  eval "$(mise activate zsh)"
 fi
 
 # Coursier lazy loading - initializes on first cs/scala/scala-cli call
